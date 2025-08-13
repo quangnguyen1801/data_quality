@@ -1,9 +1,9 @@
+pub mod comparisonop;
 pub mod configtestparameter;
-pub mod dataset;
+pub mod data_set;
 pub mod matrixexecute;
 pub mod metric;
 pub mod notification;
-pub mod operator;
 pub mod scope;
 pub mod selector;
 pub mod test;
