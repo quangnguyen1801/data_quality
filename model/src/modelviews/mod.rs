@@ -1,9 +1,9 @@
+pub mod comparisonop_view;
 pub mod configtestparameter_view;
 pub mod dataset_view;
 pub mod matrixexecute_view;
 pub mod metric_view;
 pub mod notification_view;
-pub mod operator_view;
 pub mod scope_view;
 pub mod selector_view;
 pub mod test_view;
