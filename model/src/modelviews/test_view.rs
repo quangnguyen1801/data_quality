@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 use crate::shared::enum_share::EnumGroup;
-
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TestView {
     pub id: i32,
     pub group: EnumGroup,

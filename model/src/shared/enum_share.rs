@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum EnumOperator {
     Eq(String),
     Ne(String),
@@ -8,7 +11,7 @@ pub enum EnumOperator {
     Lt(String),
     Cp(String),
 }
-
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum EnumGroup {
     Tt(String),
     Bt(String),

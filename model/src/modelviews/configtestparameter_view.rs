@@ -1,5 +1,7 @@
-use crate::shared::enum_share::EnumOperator;
+use serde::{Deserialize, Serialize};
 
+use crate::shared::enum_share::EnumOperator;
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConfigTestParameterView {
     pub id: i32,
     pub test_id: i32,

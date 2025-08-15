@@ -4,3 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.99"
+async-std = {version = "1.13.1", features=["attributes"]}
+tiberius = {version = "0.12.3", features=["all"]}
+model={path="../model"}
+serde_json = "1.0.142"
+tiberius-mappers = "0.7.0"
+async-trait = "0.1.88"
+sqlx = {version="0.8.6", features=["runtime-async-std-native-tls", "postgres", "chrono"] }
+once_cell = "1.21.3"
