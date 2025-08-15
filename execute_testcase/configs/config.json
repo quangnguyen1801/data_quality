@@ -1,0 +1,8 @@
+{
+    "app_setting": {
+        "env": "dev",
+        "dbtype": "SQLServer",
+        "sqlserver_connection": "",
+        "postgressql_connection": ""
+    }
+}
