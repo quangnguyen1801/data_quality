@@ -40,9 +40,9 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
             "INSERT INTO [dbo].[comparisonop]
            ([inc_excl]
            ,[operator])
-     VALUES
-           (@P1
-           ,@P2)",
+            VALUES
+                (@P1
+                ,@P2)",
         );
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
@@ -61,9 +61,9 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
         let mut query = Query::new(
             "UPDATE [dbo].[comparisonop]
-   SET [inc_excl] = @P1
-      ,[operator] = @P2
- WHERE id=@P3",
+            SET [inc_excl] = @P1
+                ,[operator] = @P2
+            WHERE id=@P3",
         );
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
@@ -98,7 +98,7 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgressql() -> anyhow::Result<ComparisonOp> {
+    async fn fn_repo_create_postgressql(obj: ComparisonOp) -> anyhow::Result<ComparisonOp> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
