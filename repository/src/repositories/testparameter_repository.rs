@@ -102,12 +102,12 @@ impl IRepository<TestParameter> for TestParameterRepository {
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgressql(obj: ComparisonOp) -> anyhow::Result<ComparisonOp> {
+    async fn fn_repo_create_postgressql(obj: TestParameter) -> anyhow::Result<TestParameter> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_update_postgressql(obj: ComparisonOp) -> anyhow::Result<ComparisonOp> {
+    async fn fn_repo_update_postgressql(obj: TestParameter) -> anyhow::Result<TestParameter> {
         // TODO: Implement PostgreSQL update logic
         Err(anyhow::anyhow!("Not implemented"))
     }
