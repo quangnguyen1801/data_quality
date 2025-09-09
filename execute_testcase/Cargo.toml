@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.99"
+model={path="../model"}
+service={path="../service"}
+strum = "0.27.2"
+strum_macros = "0.27.2"

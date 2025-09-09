@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use tiberius_mappers::TryFromRow;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum EnumOperator {
