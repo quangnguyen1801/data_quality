@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Ok;
-use async_std::path::Path;
-use futures::future::ok;
 use model::{
-    models::data_set,
     modelviews::{
         configtestparameter_view::ConfigTestParameterView, dataset_view::DatasetView,
         matrixexecute_view::MatrixExecuteView, metric_view::MetricView,
@@ -28,7 +25,7 @@ use crate::{
 
 pub struct Common {}
 impl Common {
-    pub async fn fn_com_load_configs_by_file(
+    pub async fn fn_ser_com_load_configs_by_file(
         path: String,
     ) -> anyhow::Result<(
         Vec<DatasetView>,
@@ -43,44 +40,50 @@ impl Common {
     )> {
         //Dataset
         let dataset =
-            Helper::fn_help_read_excel_file::<DatasetView>(path.clone(), "Dataset".to_string())
+            Helper::fn_ser_help_read_excel_file::<DatasetView>(path.clone(), "Dataset".to_string())
                 .await?;
         //Selector
-        let selector =
-            Helper::fn_help_read_excel_file::<SelectorView>(path.clone(), "Selector".to_string())
-                .await?;
+        let selector = Helper::fn_ser_help_read_excel_file::<SelectorView>(
+            path.clone(),
+            "Selector".to_string(),
+        )
+        .await?;
         //Metric
         let metric =
-            Helper::fn_help_read_excel_file::<MetricView>(path.clone(), "Metric".to_string())
+            Helper::fn_ser_help_read_excel_file::<MetricView>(path.clone(), "Metric".to_string())
                 .await?;
         //Scope
         let scope =
-            Helper::fn_help_read_excel_file::<ScopeView>(path.clone(), "Scope".to_string()).await?;
+            Helper::fn_ser_help_read_excel_file::<ScopeView>(path.clone(), "Scope".to_string())
+                .await?;
         //test
         let test =
-            Helper::fn_help_read_excel_file::<TestView>(path.clone(), "Test".to_string()).await?;
+            Helper::fn_ser_help_read_excel_file::<TestView>(path.clone(), "Test".to_string())
+                .await?;
         //TestParameter
-        let testparameter = Helper::fn_help_read_excel_file::<TestParameterView>(
+        let testparameter = Helper::fn_ser_help_read_excel_file::<TestParameterView>(
             path.clone(),
             "TestParameter".to_string(),
         )
         .await?;
         //TestParameterSet
-        let testparameterset = Helper::fn_help_read_excel_file::<ConfigTestParameterView>(
+        let testparameterset = Helper::fn_ser_help_read_excel_file::<ConfigTestParameterView>(
             path.clone(),
             "TestParameterSet".to_string(),
         )
         .await?;
         //Matrix
-        let matrix = Helper::fn_help_read_excel_file::<MatrixExecuteView>(
+        let matrix = Helper::fn_ser_help_read_excel_file::<MatrixExecuteView>(
             path.clone(),
             "Matrix".to_string(),
         )
         .await?;
         //Notification
-        let notification =
-            Helper::fn_help_read_excel_file::<NotificationView>(path, "Notification".to_string())
-                .await?;
+        let notification = Helper::fn_ser_help_read_excel_file::<NotificationView>(
+            path,
+            "Notification".to_string(),
+        )
+        .await?;
         Ok((
             dataset,
             selector,
@@ -94,7 +97,7 @@ impl Common {
         ))
     }
 
-    pub async fn fn_com_load_data_by_scope(
+    pub async fn fn_ser_com_load_data_by_scope(
         datasets: Vec<DatasetView>,
         selectors: Vec<SelectorView>,
         metrics: Vec<MetricView>,
@@ -119,7 +122,7 @@ impl Common {
                 .find(|f| f.id == data_set_id)
                 .unwrap();
             let file_name = format!("{}{}", data_set.name.clone(), ".csv");
-            let data = Helper::fn_help_read_csv_file(data_set.path.clone(), file_name).await?;
+            let data = Helper::fn_ser_help_read_csv_file(data_set.path.clone(), file_name).await?;
             let mut data_resut = Vec::new();
             if SelectorService::fn_ser_is_exists(selector_id, selectors.clone()).await? == true {
                 let selector: Vec<SelectorView> = selectors
@@ -129,7 +132,7 @@ impl Common {
                     .collect();
                 for chunk in data.chunks(1000) {
                     let data_chunk =
-                        Helper::fn_help_apply_selector_to_chunk(chunk, &selector).await;
+                        Helper::fn_ser_help_apply_selector_to_chunk(chunk, &selector).await;
                     data_resut.extend_from_slice(&data_chunk);
                 }
             }
@@ -148,7 +151,7 @@ impl Common {
         Ok((data_result, metric_result))
     }
 
-    pub async fn fn_com_build_execution_plans() -> anyhow::Result<Vec<TestExecution>> {
+    pub async fn fn_ser_com_build_execution_plans() -> anyhow::Result<Vec<TestExecution>> {
         let configs: (
             Vec<DatasetView>,
             Vec<SelectorView>,
@@ -159,23 +162,31 @@ impl Common {
             Vec<ConfigTestParameterView>,
             Vec<MatrixExecuteView>,
             Vec<NotificationView>,
-        ) = Self::fn_com_load_configs_by_file("".to_string())
+        ) = Self::fn_ser_com_load_configs_by_file("".to_string())
             .await
             .unwrap();
-        let data = Self::fn_com_load_data_by_scope(configs.0, configs.1, configs.2, configs.3)
+        let data = Self::fn_ser_com_load_data_by_scope(configs.0, configs.1, configs.2, configs.3)
             .await
             .unwrap();
-        let parameters = Self::fn_com_parameter_execution_set(configs.5, configs.6)
+        let parameters = Self::fn_ser_com_parameter_execution_set(configs.5, configs.6)
             .await
             .unwrap();
-        let list_testcase_executions =
-            Self::fn_com_test_execution_set(configs.4, parameters, data.0, data.1)
+        let mut list_testcase_executions =
+            Self::fn_ser_com_test_execution_set(configs.4, parameters)
                 .await
                 .unwrap();
+        list_testcase_executions = Self::fn_ser_com_apply_matrix_execution(
+            list_testcase_executions,
+            data.0,
+            data.1,
+            configs.7,
+        )
+        .await
+        .unwrap();
         Ok(list_testcase_executions)
     }
 
-    pub async fn fn_com_parameter_execution_set(
+    pub async fn fn_ser_com_parameter_execution_set(
         parameters: Vec<TestParameterView>,
         config_parameters: Vec<ConfigTestParameterView>,
     ) -> anyhow::Result<HashMap<String, HashMap<String, Vec<ParameterSet>>>> {
@@ -206,11 +217,9 @@ impl Common {
         Ok(list_params)
     }
 
-    pub async fn fn_com_test_execution_set(
+    pub async fn fn_ser_com_test_execution_set(
         testcases: Vec<TestView>,
         mut parameters: HashMap<String, HashMap<String, Vec<ParameterSet>>>,
-        mut datasets: HashMap<String, Vec<HashMap<String, String>>>,
-        mut columns_check: HashMap<String, Vec<String>>,
     ) -> anyhow::Result<Vec<TestExecution>> {
         let mut config_test_executions: Vec<TestExecution> = Vec::new();
         for t in testcases.iter().cloned() {
@@ -220,11 +229,52 @@ impl Common {
                     test_id: t.id,
                     test_name: t.description.clone(),
                     test_parameter: p,
-                    test_data: datasets.entry(t.id.to_string()).or_default().clone(),
-                    test_columns: columns_check.entry(t.id.to_string()).or_default().clone(),
+                    test_data: Vec::new(),
+                    test_columns: Vec::new(),
+                    sope_id: 0,
+                    matrix_id: 0,
                 });
             }
         }
         Ok(config_test_executions)
+    }
+
+    pub async fn fn_ser_com_apply_matrix_execution(
+        testcases: Vec<TestExecution>,
+        data_executes: HashMap<String, Vec<HashMap<String, String>>>,
+        columns_check: HashMap<String, Vec<String>>,
+        matrix: Vec<MatrixExecuteView>,
+    ) -> anyhow::Result<Vec<TestExecution>> {
+        let mut list_actual_test_execution = Vec::new();
+        for m in matrix.iter() {
+            for s in m.scope_id.iter() {
+                let scope_key = s.to_string();
+                let data_rows = data_executes.get(&scope_key).cloned().unwrap_or_default();
+                let column_list = columns_check.get(&scope_key).cloned().unwrap_or_default();
+
+                let maybe_test = testcases.iter().find(|t| {
+                    t.test_id == m.test_id
+                        && t.test_parameter
+                            .iter()
+                            .any(|p| p.param_group == m.config_test_paramter_id)
+                });
+
+                match maybe_test {
+                    Some(base_test) => {
+                        let mut test = base_test.clone();
+                        test.test_data = data_rows;
+                        test.test_columns = column_list;
+                        test.sope_id = *s;
+                        test.matrix_id = m.id;
+                        list_actual_test_execution.push(test);
+                    }
+                    None => eprintln!(
+                        "Can not find test_id={} with param_group={} in scope={}",
+                        m.test_id, m.config_test_paramter_id, scope_key
+                    ),
+                }
+            }
+        }
+        Ok(list_actual_test_execution)
     }
 }

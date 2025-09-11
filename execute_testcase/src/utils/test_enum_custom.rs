@@ -15,7 +15,8 @@ pub enum EnumTestType {
 }
 
 impl EnumTestType {
-    pub fn fn_enum_from_name(test_name: String) -> Option<Self> {
+    #[allow(dead_code)]
+    pub fn fn_run_enum_from_name(test_name: String) -> Option<Self> {
         match test_name.as_str() {
             "Test1" => Some(Self::TestCaseForexDailyIsInCheck),
             "Test2" => Some(Self::TestCaseForexDailyOutlierTolerance),
@@ -23,14 +24,14 @@ impl EnumTestType {
         }
     }
 
-    pub fn fn_enum_get_name(&self) -> &'static str {
+    pub fn fn_run_enum_get_name(&self) -> &'static str {
         match self {
             EnumTestType::TestCaseForexDailyIsInCheck => "test1",
             EnumTestType::TestCaseForexDailyOutlierTolerance => "test2",
         }
     }
 
-    pub fn fn_enum_get_logic(&self) -> Box<dyn TestLogic> {
+    pub fn fn_run_enum_get_logic(&self) -> Box<dyn TestLogic> {
         match self {
             EnumTestType::TestCaseForexDailyIsInCheck => Box::new(TestCaseForexDailyIsInCheck),
             EnumTestType::TestCaseForexDailyOutlierTolerance => {

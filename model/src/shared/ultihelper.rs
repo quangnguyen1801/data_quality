@@ -22,6 +22,8 @@ pub struct TestExecution {
     pub test_parameter: Vec<ParameterSet>,
     pub test_data: Vec<HashMap<String, String>>,
     pub test_columns: Vec<String>,
+    pub sope_id: i32,
+    pub matrix_id: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

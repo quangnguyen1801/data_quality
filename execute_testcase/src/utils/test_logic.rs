@@ -1,12 +1,8 @@
-use std::collections::HashMap;
-
-use model::modelviews::configtestparameter_view::ConfigTestParameterView;
+use model::shared::ultihelper::TestExecution;
 
 pub trait TestLogic {
-    fn fn_com_test_run(
+    fn fn_run_com_test_run(
         &self,
-        row: &HashMap<String, String>,
-        metric: &str,
-        params: &ConfigTestParameterView,
+        test_execution: TestExecution,
     ) -> anyhow::Result<(bool, Option<String>)>;
 }

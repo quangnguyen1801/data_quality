@@ -1,12 +1,12 @@
+use model::shared::ultihelper::TestExecution;
+
 use crate::utils::test_logic::TestLogic;
 
 pub struct TestCaseForexDailyIsInCheck;
 impl TestLogic for TestCaseForexDailyIsInCheck {
-    fn fn_com_test_run(
+    fn fn_run_com_test_run(
         &self,
-        row: &std::collections::HashMap<String, String>,
-        metric: &str,
-        params: &model::modelviews::configtestparameter_view::ConfigTestParameterView,
+        test_case: TestExecution,
     ) -> anyhow::Result<(bool, Option<String>)> {
         todo!()
     }

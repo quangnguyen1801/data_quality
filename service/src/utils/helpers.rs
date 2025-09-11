@@ -11,7 +11,7 @@ use serde::de::DeserializeOwned;
 
 pub struct Helper {}
 impl Helper {
-    pub async fn fn_help_read_excel_file<T>(
+    pub async fn fn_ser_help_read_excel_file<T>(
         path: String,
         sheet_name: String,
     ) -> anyhow::Result<Vec<T>>
@@ -32,7 +32,7 @@ impl Helper {
         Ok(result)
     }
 
-    pub async fn fn_help_read_csv_file(
+    pub async fn fn_ser_help_read_csv_file(
         path: String,
         file_name: String,
     ) -> anyhow::Result<Vec<HashMap<String, String>>> {
@@ -53,7 +53,7 @@ impl Helper {
         Ok(records)
     }
 
-    pub async fn fn_help_apply_selector_to_chunk(
+    pub async fn fn_ser_help_apply_selector_to_chunk(
         chunk: &[HashMap<String, String>],
         selectors: &[SelectorView],
     ) -> Vec<HashMap<String, String>> {
@@ -65,7 +65,7 @@ impl Helper {
                     continue;
                 }
                 let value = row.get(&selector.field_name).unwrap();
-                let ok = Self::fn_help_check_selector_condition(value, selector)
+                let ok = Self::fn_ser_help_check_selector_condition(value, selector)
                     .await
                     .unwrap_or(false);
                 if !ok {
@@ -80,7 +80,7 @@ impl Helper {
         return result;
     }
 
-    pub async fn fn_help_check_selector_condition(
+    pub async fn fn_ser_help_check_selector_condition(
         value: &str,
         selector: &SelectorView,
     ) -> anyhow::Result<bool> {
@@ -89,11 +89,12 @@ impl Helper {
             "NE" => Ok(value != selector.vlow.as_str()),
             "BT" => {
                 let format = "%Y-%m-%d";
-                if Self::fn_help_is_datetime(value) {
-                    let v = Self::fn_help_parse_datetime(value, format).unwrap();
-                    let low = Self::fn_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
+                if Self::fn_ser_help_is_datetime(value) {
+                    let v = Self::fn_ser_help_parse_datetime(value, format).unwrap();
+                    let low =
+                        Self::fn_ser_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
                     let high =
-                        Self::fn_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
+                        Self::fn_ser_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
                     match (v, low, high) {
                         (v, l, h) => Ok(v >= l && v <= h),
                         _ => Ok(false),
@@ -110,9 +111,10 @@ impl Helper {
             }
             "GE" => {
                 let format = "%Y-%m-%d";
-                if Self::fn_help_is_datetime(value) {
-                    let v = Self::fn_help_parse_datetime(value, format).unwrap();
-                    let low = Self::fn_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
+                if Self::fn_ser_help_is_datetime(value) {
+                    let v = Self::fn_ser_help_parse_datetime(value, format).unwrap();
+                    let low =
+                        Self::fn_ser_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
                     match (v, low) {
                         (v, l) => Ok(v >= l),
                         _ => Ok(false),
@@ -128,9 +130,10 @@ impl Helper {
             }
             "GT" => {
                 let format = "%Y-%m-%d";
-                if Self::fn_help_is_datetime(value) {
-                    let v = Self::fn_help_parse_datetime(value, format).unwrap();
-                    let low = Self::fn_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
+                if Self::fn_ser_help_is_datetime(value) {
+                    let v = Self::fn_ser_help_parse_datetime(value, format).unwrap();
+                    let low =
+                        Self::fn_ser_help_parse_datetime(selector.vlow.as_str(), format).unwrap();
                     match (v, low) {
                         (v, l) => Ok(v > l),
                         _ => Ok(false),
@@ -146,10 +149,10 @@ impl Helper {
             }
             "LE" => {
                 let format = "%Y-%m-%d";
-                if Self::fn_help_is_datetime(value) {
-                    let v = Self::fn_help_parse_datetime(value, format).unwrap();
+                if Self::fn_ser_help_is_datetime(value) {
+                    let v = Self::fn_ser_help_parse_datetime(value, format).unwrap();
                     let high =
-                        Self::fn_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
+                        Self::fn_ser_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
                     match (v, high) {
                         (v, h) => Ok(v <= h),
                         _ => Ok(false),
@@ -165,10 +168,10 @@ impl Helper {
             }
             "LT" => {
                 let format = "%Y-%m-%d";
-                if Self::fn_help_is_datetime(value) {
-                    let v = Self::fn_help_parse_datetime(value, format).unwrap();
+                if Self::fn_ser_help_is_datetime(value) {
+                    let v = Self::fn_ser_help_parse_datetime(value, format).unwrap();
                     let high =
-                        Self::fn_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
+                        Self::fn_ser_help_parse_datetime(selector.vhigh.as_str(), format).unwrap();
                     match (v, high) {
                         (v, h) => Ok(v < h),
                         _ => Ok(false),
@@ -194,11 +197,11 @@ impl Helper {
         }
     }
 
-    pub fn fn_help_is_datetime(s: &str) -> bool {
+    pub fn fn_ser_help_is_datetime(s: &str) -> bool {
         NaiveDateTime::parse_from_str(s, "%Y-%m-%d").is_ok()
     }
 
-    pub fn fn_help_parse_datetime(s: &str, format: &str) -> Option<NaiveDateTime> {
+    pub fn fn_ser_help_parse_datetime(s: &str, format: &str) -> Option<NaiveDateTime> {
         NaiveDateTime::parse_from_str(s, format).ok()
     }
 }
