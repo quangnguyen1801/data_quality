@@ -1,7 +1,6 @@
 use anyhow::Ok;
 use async_trait::async_trait;
-use futures::future::ok;
-use model::modelviews::dataset_view::DatasetView;
+use model::{modelviews::dataset_view::DatasetView, shared::ultihelper::CONFIGS};
 use repository::{
     repositories::dataset_repository::DatasetRepository, shared::irepository::IRepository,
 };
@@ -12,14 +11,24 @@ pub struct DatasetService {}
 #[async_trait]
 impl IDatasetService for DatasetService {
     async fn fn_ser_get_by_id(id: i32) -> anyhow::Result<DatasetView> {
-        let data = DatasetRepository::fn_repo_get_by_id_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_get_by_id_sqlserver(id).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_by_id_postgressql(id).await?,
+            _ => DatasetRepository::fn_repo_get_by_id_sqlserver(id).await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
     }
 
     async fn fn_ser_get_all() -> anyhow::Result<Vec<DatasetView>> {
-        let data = DatasetRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgressql().await?,
+            _ => DatasetRepository::fn_repo_get_all_sqlserver().await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
@@ -37,7 +46,12 @@ impl IDatasetService for DatasetService {
         }
         let start = (page_index - 1) * page_size;
         let end = page_index * page_size;
-        let mut data = DatasetRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let mut data = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgressql().await?,
+            _ => DatasetRepository::fn_repo_get_all_sqlserver().await?,
+        };
         if data.len() > start {
             if data.len() > end {
                 data = data.iter().skip(start).take(end).cloned().collect();
@@ -54,7 +68,12 @@ impl IDatasetService for DatasetService {
     async fn fn_ser_create(obj: DatasetView) -> anyhow::Result<DatasetView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = DatasetRepository::fn_repo_create_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_create_sqlserver(data).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_create_postgressql(data).await?,
+            _ => DatasetRepository::fn_repo_create_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
@@ -62,13 +81,23 @@ impl IDatasetService for DatasetService {
     async fn fn_ser_update(obj: DatasetView) -> anyhow::Result<DatasetView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = DatasetRepository::fn_repo_update_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_update_sqlserver(data).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_update_postgressql(data).await?,
+            _ => DatasetRepository::fn_repo_update_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
 
     async fn fn_ser_delete(id: i32) -> anyhow::Result<bool> {
-        let result = DatasetRepository::fn_repo_delete_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => DatasetRepository::fn_repo_delete_sqlserver(id).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_delete_postgressql(id).await?,
+            _ => DatasetRepository::fn_repo_delete_sqlserver(id).await?,
+        };
         Ok(result)
     }
 

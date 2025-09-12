@@ -3,6 +3,8 @@
         "env": "dev",
         "dbtype": "SQLServer",
         "sqlserver_connection": "",
-        "postgressql_connection": ""
+        "postgressql_connection": "",
+        "settings_path": "",
+        "datasets_path": ""
     }
 }

@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use model::modelviews::scope_view::ScopeView;
+use model::{modelviews::scope_view::ScopeView, shared::ultihelper::CONFIGS};
 use repository::{
     repositories::scope_repository::ScopeRepository, shared::irepository::IRepository,
 };
@@ -10,14 +10,24 @@ pub struct ScopeService {}
 #[async_trait]
 impl IScopeService for ScopeService {
     async fn fn_ser_get_by_id(id: i32) -> anyhow::Result<ScopeView> {
-        let data = ScopeRepository::fn_repo_get_by_id_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_get_by_id_sqlserver(id).await?,
+            "PostgreSql" => ScopeRepository::fn_repo_get_by_id_postgressql(id).await?,
+            _ => ScopeRepository::fn_repo_get_by_id_sqlserver(id).await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
     }
 
     async fn fn_ser_get_all() -> anyhow::Result<Vec<ScopeView>> {
-        let data = ScopeRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => ScopeRepository::fn_repo_get_all_postgressql().await?,
+            _ => ScopeRepository::fn_repo_get_all_sqlserver().await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
@@ -35,7 +45,12 @@ impl IScopeService for ScopeService {
         }
         let start = (page_index - 1) * page_size;
         let end = page_index * page_size;
-        let mut data = ScopeRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let mut data = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => ScopeRepository::fn_repo_get_all_postgressql().await?,
+            _ => ScopeRepository::fn_repo_get_all_sqlserver().await?,
+        };
         if data.len() > start {
             if data.len() > end {
                 data = data.iter().skip(start).take(end).cloned().collect();
@@ -52,7 +67,12 @@ impl IScopeService for ScopeService {
     async fn fn_ser_create(obj: ScopeView) -> anyhow::Result<ScopeView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = ScopeRepository::fn_repo_create_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_create_sqlserver(data).await?,
+            "PostgreSql" => ScopeRepository::fn_repo_create_postgressql(data).await?,
+            _ => ScopeRepository::fn_repo_create_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
@@ -60,13 +80,23 @@ impl IScopeService for ScopeService {
     async fn fn_ser_update(obj: ScopeView) -> anyhow::Result<ScopeView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = ScopeRepository::fn_repo_update_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_update_sqlserver(data).await?,
+            "PostgreSql" => ScopeRepository::fn_repo_update_postgressql(data).await?,
+            _ => ScopeRepository::fn_repo_update_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
 
     async fn fn_ser_delete(id: i32) -> anyhow::Result<bool> {
-        let result = ScopeRepository::fn_repo_delete_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => ScopeRepository::fn_repo_delete_sqlserver(id).await?,
+            "PostgreSql" => ScopeRepository::fn_repo_delete_postgressql(id).await?,
+            _ => ScopeRepository::fn_repo_delete_sqlserver(id).await?,
+        };
         Ok(result)
     }
 }

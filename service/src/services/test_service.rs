@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use model::modelviews::test_view::TestView;
+use model::{modelviews::test_view::TestView, shared::ultihelper::CONFIGS};
 use repository::{repositories::test_repository::TestRepository, shared::irepository::IRepository};
 
 use crate::iservices::itest_service::ITestService;
@@ -8,14 +8,24 @@ pub struct TestService {}
 #[async_trait]
 impl ITestService for TestService {
     async fn fn_ser_get_by_id(id: i32) -> anyhow::Result<TestView> {
-        let data = TestRepository::fn_repo_get_by_id_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_get_by_id_sqlserver(id).await?,
+            "PostgreSql" => TestRepository::fn_repo_get_by_id_postgressql(id).await?,
+            _ => TestRepository::fn_repo_get_by_id_sqlserver(id).await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
     }
 
     async fn fn_ser_get_all() -> anyhow::Result<Vec<TestView>> {
-        let data = TestRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => TestRepository::fn_repo_get_all_postgressql().await?,
+            _ => TestRepository::fn_repo_get_all_sqlserver().await?,
+        };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
         Ok(result)
@@ -33,7 +43,12 @@ impl ITestService for TestService {
         }
         let start = (page_index - 1) * page_size;
         let end = page_index * page_size;
-        let mut data = TestRepository::fn_repo_get_all_sqlserver().await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let mut data = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_get_all_sqlserver().await?,
+            "PostgreSql" => TestRepository::fn_repo_get_all_postgressql().await?,
+            _ => TestRepository::fn_repo_get_all_sqlserver().await?,
+        };
         if data.len() > start {
             if data.len() > end {
                 data = data.iter().skip(start).take(end).cloned().collect();
@@ -50,7 +65,12 @@ impl ITestService for TestService {
     async fn fn_ser_create(obj: TestView) -> anyhow::Result<TestView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = TestRepository::fn_repo_create_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_create_sqlserver(data).await?,
+            "PostgreSql" => TestRepository::fn_repo_create_postgressql(data).await?,
+            _ => TestRepository::fn_repo_create_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
@@ -58,13 +78,23 @@ impl ITestService for TestService {
     async fn fn_ser_update(obj: TestView) -> anyhow::Result<TestView> {
         let json = serde_json::to_string(&obj)?;
         let data = serde_json::from_str(&json)?;
-        let result = TestRepository::fn_repo_update_sqlserver(data).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_update_sqlserver(data).await?,
+            "PostgreSql" => TestRepository::fn_repo_update_postgressql(data).await?,
+            _ => TestRepository::fn_repo_update_sqlserver(data).await?,
+        };
         let js_result = serde_json::to_string(&result)?;
         Ok(serde_json::from_str(&js_result)?)
     }
 
     async fn fn_ser_delete(id: i32) -> anyhow::Result<bool> {
-        let result = TestRepository::fn_repo_delete_sqlserver(id).await?;
+        let dbtype = (&CONFIGS.app_setting.dbtype).clone();
+        let result = match dbtype.as_str() {
+            "SQLServer" => TestRepository::fn_repo_delete_sqlserver(id).await?,
+            "PostgreSql" => TestRepository::fn_repo_delete_postgressql(id).await?,
+            _ => TestRepository::fn_repo_delete_sqlserver(id).await?,
+        };
         Ok(result)
     }
 }

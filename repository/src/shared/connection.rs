@@ -1,10 +1,11 @@
 use anyhow::Ok;
 use async_std::net::TcpStream;
 use async_trait::async_trait;
+use model::shared::ultihelper::CONFIGS;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use tiberius::{Client, Config};
 
-use crate::shared::{commonfuntion::CONFIGS, iconnection::IConnection};
+use crate::shared::iconnection::IConnection;
 
 pub struct Connection {}
 #[async_trait]

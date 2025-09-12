@@ -8,7 +8,7 @@ use model::{
         notification_view::NotificationView, scope_view::ScopeView, selector_view::SelectorView,
         test_view::TestView, testparameter_view::TestParameterView,
     },
-    shared::ultihelper::{ParameterSet, TestExecution},
+    shared::ultihelper::{CONFIGS, ParameterSet, TestExecution},
 };
 
 use crate::{
@@ -122,7 +122,15 @@ impl Common {
                 .find(|f| f.id == data_set_id)
                 .unwrap();
             let file_name = format!("{}{}", data_set.name.clone(), ".csv");
-            let data = Helper::fn_ser_help_read_csv_file(data_set.path.clone(), file_name).await?;
+            let data = Helper::fn_ser_help_read_csv_file(
+                format!(
+                    "{}/{}",
+                    CONFIGS.app_setting.root_datasets_path,
+                    data_set.path.clone()
+                ),
+                file_name,
+            )
+            .await?;
             let mut data_resut = Vec::new();
             if SelectorService::fn_ser_is_exists(selector_id, selectors.clone()).await? == true {
                 let selector: Vec<SelectorView> = selectors
@@ -152,6 +160,7 @@ impl Common {
     }
 
     pub async fn fn_ser_com_build_execution_plans() -> anyhow::Result<Vec<TestExecution>> {
+        let path = &CONFIGS.app_setting.settings_path;
         let configs: (
             Vec<DatasetView>,
             Vec<SelectorView>,
@@ -162,7 +171,7 @@ impl Common {
             Vec<ConfigTestParameterView>,
             Vec<MatrixExecuteView>,
             Vec<NotificationView>,
-        ) = Self::fn_ser_com_load_configs_by_file("".to_string())
+        ) = Self::fn_ser_com_load_configs_by_file(path.clone())
             .await
             .unwrap();
         let data = Self::fn_ser_com_load_data_by_scope(configs.0, configs.1, configs.2, configs.3)

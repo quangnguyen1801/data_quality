@@ -1640,6 +1640,7 @@ name = "model"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "once_cell",
  "serde",
  "serde_json",
  "tiberius",
@@ -2184,7 +2185,6 @@ dependencies = [
  "async-std",
  "async-trait",
  "model",
- "once_cell",
  "serde_json",
  "sqlx",
  "tiberius",
