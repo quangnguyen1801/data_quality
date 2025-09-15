@@ -6,5 +6,5 @@ use tiberius::Client;
 #[async_trait]
 pub trait IConnection {
     async fn fn_repo_get_connection_sqlsever() -> anyhow::Result<Client<TcpStream>>;
-    async fn fn_repo_get_connection_postgressql() -> anyhow::Result<Pool<Postgres>>;
+    async fn fn_repo_get_connection_postgresql() -> anyhow::Result<Pool<Postgres>>;
 }

@@ -11,4 +11,7 @@ pub trait IMatrixExecuteService {
     async fn fn_ser_create(obj: MatrixExecuteView) -> anyhow::Result<MatrixExecuteView>;
     async fn fn_ser_update(obj: MatrixExecuteView) -> anyhow::Result<MatrixExecuteView>;
     async fn fn_ser_delete(id: i32) -> anyhow::Result<bool>;
+    async fn fn_ser_get_by_setting_version_id(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<MatrixExecuteView>>;
 }

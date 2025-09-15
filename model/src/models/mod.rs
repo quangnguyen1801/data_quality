@@ -6,5 +6,6 @@ pub mod metric;
 pub mod notification;
 pub mod scope;
 pub mod selector;
+pub mod settingversion;
 pub mod test;
 pub mod testparameter;

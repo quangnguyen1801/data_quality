@@ -10,4 +10,5 @@ pub struct ConfigTestParameter {
     pub operator: i32,
     pub vlow: String,
     pub vhigh: String,
+    pub setting_version_id: i32,
 }

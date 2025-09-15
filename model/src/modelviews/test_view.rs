@@ -8,4 +8,5 @@ pub struct TestView {
     pub group: EnumGroup,
     pub description: String,
     pub expired: Option<DateTime<Utc>>,
+    pub setting_version_id: i32,
 }

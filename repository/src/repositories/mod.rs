@@ -6,5 +6,6 @@ pub mod metric_repository;
 pub mod notification_repository;
 pub mod scope_repository;
 pub mod selector_repository;
+pub mod settingversion_repository;
 pub mod test_repository;
 pub mod testparameter_repository;

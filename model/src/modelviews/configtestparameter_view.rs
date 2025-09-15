@@ -9,4 +9,5 @@ pub struct ConfigTestParameterView {
     pub operator: String,
     pub vlow: String,
     pub vhigh: String,
+    pub setting_version_id: i32,
 }

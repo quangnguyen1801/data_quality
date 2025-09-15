@@ -6,5 +6,6 @@ pub mod metric_view;
 pub mod notification_view;
 pub mod scope_view;
 pub mod selector_view;
+pub mod settingversion_view;
 pub mod test_view;
 pub mod testparameter_view;

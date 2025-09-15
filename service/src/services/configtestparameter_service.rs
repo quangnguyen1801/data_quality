@@ -16,9 +16,7 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let data = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_get_by_id_sqlserver(id).await?,
-            "PostgreSql" => {
-                ConfigTestParameterRepository::fn_repo_get_by_id_postgressql(id).await?
-            }
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_get_by_id_postgresql(id).await?,
             _ => ConfigTestParameterRepository::fn_repo_get_by_id_sqlserver(id).await?,
         };
         let json = serde_json::to_string(&data)?;
@@ -30,7 +28,7 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let data = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_get_all_sqlserver().await?,
-            "PostgreSql" => ConfigTestParameterRepository::fn_repo_get_all_postgressql().await?,
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_get_all_postgresql().await?,
             _ => ConfigTestParameterRepository::fn_repo_get_all_sqlserver().await?,
         };
         let json = serde_json::to_string(&data)?;
@@ -53,7 +51,7 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let mut data = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_get_all_sqlserver().await?,
-            "PostgreSql" => ConfigTestParameterRepository::fn_repo_get_all_postgressql().await?,
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_get_all_postgresql().await?,
             _ => ConfigTestParameterRepository::fn_repo_get_all_sqlserver().await?,
         };
         if data.len() > start {
@@ -77,7 +75,7 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_create_sqlserver(data).await?,
-            "PostgreSql" => ConfigTestParameterRepository::fn_repo_create_postgressql(data).await?,
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_create_postgresql(data).await?,
             _ => ConfigTestParameterRepository::fn_repo_create_sqlserver(data).await?,
         };
         let js_result = serde_json::to_string(&result)?;
@@ -92,7 +90,7 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_update_sqlserver(data).await?,
-            "PostgreSql" => ConfigTestParameterRepository::fn_repo_update_postgressql(data).await?,
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_update_postgresql(data).await?,
             _ => ConfigTestParameterRepository::fn_repo_update_sqlserver(data).await?,
         };
         let js_result = serde_json::to_string(&result)?;
@@ -103,9 +101,38 @@ impl IConfigTestParameterService for ConfigTestParameterService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => ConfigTestParameterRepository::fn_repo_delete_sqlserver(id).await?,
-            "PostgreSql" => ConfigTestParameterRepository::fn_repo_delete_postgressql(id).await?,
+            "PostgreSql" => ConfigTestParameterRepository::fn_repo_delete_postgresql(id).await?,
             _ => ConfigTestParameterRepository::fn_repo_delete_sqlserver(id).await?,
         };
+        Ok(result)
+    }
+
+    async fn fn_ser_get_by_setting_version_id(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<ConfigTestParameterView>> {
+        let dbtype = CONFIGS.app_setting.dbtype.clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => {
+                ConfigTestParameterRepository::fn_repo_get_by_setting_version_sqlserver(
+                    setting_version_id,
+                )
+                .await?
+            }
+            "PostgreSql" => {
+                ConfigTestParameterRepository::fn_repo_get_by_setting_version_postgresql(
+                    setting_version_id,
+                )
+                .await?
+            }
+            _ => {
+                ConfigTestParameterRepository::fn_repo_get_by_setting_version_sqlserver(
+                    setting_version_id,
+                )
+                .await?
+            }
+        };
+        let json = serde_json::to_string(&data)?;
+        let result = serde_json::from_str(&json)?;
         Ok(result)
     }
 }

@@ -18,10 +18,10 @@ impl IConnection for Connection {
         Ok(client)
     }
 
-    async fn fn_repo_get_connection_postgressql() -> anyhow::Result<Pool<Postgres>> {
+    async fn fn_repo_get_connection_postgresql() -> anyhow::Result<Pool<Postgres>> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
-            .connect(&CONFIGS.app_setting.postgressql_connection)
+            .connect(&CONFIGS.app_setting.postgresql_connection)
             .await?;
         Ok(pool)
     }

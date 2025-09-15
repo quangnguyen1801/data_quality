@@ -1,59 +1,54 @@
+use anyhow::Ok;
 use async_trait::async_trait;
-use model::models::selector::Selector;
+use model::models::settingversion::SettingVersion;
 use tiberius::Query;
 use tiberius_mappers::TryFromRow;
 
-use crate::shared::{connection::Connection, iconnection::IConnection, irepository::IRepository};
+use crate::{
+    irepositories::isettingversion_repository::ISettingVersionRepository,
+    shared::{connection::Connection, iconnection::IConnection, irepository::IRepository},
+};
 
-pub struct SelectorRepository {}
+pub struct SettingVersionRepository {}
 #[async_trait]
-impl IRepository<Selector> for SelectorRepository {
-    async fn fn_repo_get_by_id_sqlserver(id: i32) -> anyhow::Result<Selector> {
+impl IRepository<SettingVersion> for SettingVersionRepository {
+    async fn fn_repo_get_by_id_sqlserver(id: i32) -> anyhow::Result<SettingVersion> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
         let mut rows = client
-            .query("SELECT * FROM selector WHERE id =@P1", &[&id])
+            .query("SELECT * FROM setting_version WHERE id =@P1", &[&id])
             .await?
             .into_first_result()
             .await?;
         let row = rows.pop().unwrap();
-        Ok(Selector::try_from_row(row)?)
+        Ok(SettingVersion::try_from_row(row)?)
     }
 
-    async fn fn_repo_get_all_sqlserver() -> anyhow::Result<Vec<Selector>> {
+    async fn fn_repo_get_all_sqlserver() -> anyhow::Result<Vec<SettingVersion>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
         let rows = client
-            .query("SELECT * FROM selector", &[])
+            .query("SELECT * FROM setting_version", &[])
             .await?
             .into_first_result()
             .await?;
         let mut result = Vec::new();
         for row in rows {
-            result.push(Selector::try_from_row(row)?);
+            result.push(SettingVersion::try_from_row(row)?);
         }
         Ok(result)
     }
 
-    async fn fn_repo_create_sqlserver(obj: Selector) -> anyhow::Result<Selector> {
+    async fn fn_repo_create_sqlserver(obj: SettingVersion) -> anyhow::Result<SettingVersion> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
         let mut query = Query::new(
-            "INSERT INTO [dbo].[selector]
-           ([field_name]
-           ,[inc_excl]
-           ,[operator]
-           ,[vlow]
-           ,[vhigh])
+            "INSERT INTO [dbo].[setting_version]
+           ([file_name]
+           ,[upddate])
             VALUES
                 (@P1
-                ,@P2
-                ,@P3
-                ,@P4
-                ,@P5)",
+                ,@P2)",
         );
-        query.bind(obj.field_name);
-        query.bind(obj.inc_excl);
-        query.bind(obj.operator);
-        query.bind(obj.vlow);
-        query.bind(obj.vhigh);
+        query.bind(obj.file_name);
+        query.bind(obj.upddate);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -64,23 +59,18 @@ impl IRepository<Selector> for SelectorRepository {
         }
     }
 
-    async fn fn_repo_update_sqlserver(obj: Selector) -> anyhow::Result<Selector> {
+    async fn fn_repo_update_sqlserver(obj: SettingVersion) -> anyhow::Result<SettingVersion> {
         let objclone = obj.clone();
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
         let mut query = Query::new(
-            "UPDATE [dbo].[selector]
-            SET [field_name] = @P1
-                ,[inc_excl] = @P2
-                ,[operator] = @P3
-                ,[vlow] = @P4
-                ,[vhigh] = @P5
-            WHERE id = @P6",
+            "UPDATE [dbo].[setting_version]
+            SET [file_name] = @P1
+                ,[upddate] = @P2
+            WHERE id = @P3",
         );
-        query.bind(obj.field_name);
-        query.bind(obj.inc_excl);
-        query.bind(obj.operator);
-        query.bind(obj.vlow);
-        query.bind(obj.vhigh);
+        query.bind(obj.file_name);
+        query.bind(obj.upddate);
+        query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
             Ok(objclone)
@@ -91,7 +81,7 @@ impl IRepository<Selector> for SelectorRepository {
 
     async fn fn_repo_delete_sqlserver(id: i32) -> anyhow::Result<bool> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut query = Query::new("DELETE FROM [dbo].[selector] WHERE id = @P1");
+        let mut query = Query::new("DELETE FROM [dbo].[setting_version] WHERE id = @P1");
         query.bind(id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -103,39 +93,28 @@ impl IRepository<Selector> for SelectorRepository {
 
     async fn fn_repo_get_by_setting_version_sqlserver(
         setting_version_id: i32,
-    ) -> anyhow::Result<Vec<Selector>> {
-        let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
-            .query(
-                "SELECT * FROM selector WHERE setting_version_id =@P1",
-                &[&setting_version_id],
-            )
-            .await?
-            .into_first_result()
-            .await?;
+    ) -> anyhow::Result<Vec<SettingVersion>> {
         let mut result = Vec::new();
-        for row in rows {
-            result.push(Selector::try_from_row(row)?);
-        }
+        result.push(Self::fn_repo_get_by_id_sqlserver(setting_version_id).await?);
         Ok(result)
     }
 
-    async fn fn_repo_get_by_id_postgresql(id: i32) -> anyhow::Result<Selector> {
+    async fn fn_repo_get_by_id_postgresql(id: i32) -> anyhow::Result<SettingVersion> {
         // TODO: Implement PostgreSQL get by id logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_get_all_postgresql() -> anyhow::Result<Vec<Selector>> {
+    async fn fn_repo_get_all_postgresql() -> anyhow::Result<Vec<SettingVersion>> {
         // TODO: Implement PostgreSQL get all logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgresql(obj: Selector) -> anyhow::Result<Selector> {
+    async fn fn_repo_create_postgresql(obj: SettingVersion) -> anyhow::Result<SettingVersion> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_update_postgresql(obj: Selector) -> anyhow::Result<Selector> {
+    async fn fn_repo_update_postgresql(obj: SettingVersion) -> anyhow::Result<SettingVersion> {
         // TODO: Implement PostgreSQL update logic
         Err(anyhow::anyhow!("Not implemented"))
     }
@@ -147,7 +126,21 @@ impl IRepository<Selector> for SelectorRepository {
 
     async fn fn_repo_get_by_setting_version_postgresql(
         setting_version_id: i32,
-    ) -> anyhow::Result<Vec<Selector>> {
+    ) -> anyhow::Result<Vec<SettingVersion>> {
+        // TODO: Implement PostgreSQL delete logic
+        Err(anyhow::anyhow!("Not implemented"))
+    }
+}
+
+#[async_trait]
+impl ISettingVersionRepository<SettingVersion> for SettingVersionRepository {
+    async fn fn_repo_get_current_version_sqlserver() -> anyhow::Result<Option<SettingVersion>> {
+        let data = Self::fn_repo_get_all_sqlserver().await?;
+        let result = data.iter().cloned().max_by_key(|s| s.upddate);
+        Ok(result)
+    }
+
+    async fn fn_repo_get_current_version_postgresql() -> anyhow::Result<Option<SettingVersion>> {
         // TODO: Implement PostgreSQL delete logic
         Err(anyhow::anyhow!("Not implemented"))
     }

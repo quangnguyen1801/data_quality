@@ -8,4 +8,5 @@ pub struct Test {
     pub group: String,
     pub description: String,
     pub expired: Option<DateTime<Utc>>,
+    pub setting_version_id: i32,
 }

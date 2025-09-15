@@ -6,5 +6,6 @@ pub mod imetric_service;
 pub mod inotification_service;
 pub mod iscope_service;
 pub mod iselector_service;
+pub mod isettingversion_service;
 pub mod itest_service;
 pub mod itestparameter_service;

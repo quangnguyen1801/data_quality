@@ -87,27 +87,53 @@ impl IRepository<Metric> for MetricRepository {
         }
     }
 
-    async fn fn_repo_get_by_id_postgressql(id: i32) -> anyhow::Result<Metric> {
+    async fn fn_repo_get_by_setting_version_sqlserver(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<Metric>> {
+        let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
+        let mut rows = client
+            .query(
+                "SELECT * FROM metric WHERE setting_version_id =@P1",
+                &[&setting_version_id],
+            )
+            .await?
+            .into_first_result()
+            .await?;
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(Metric::try_from_row(row)?);
+        }
+        Ok(result)
+    }
+
+    async fn fn_repo_get_by_id_postgresql(id: i32) -> anyhow::Result<Metric> {
         // TODO: Implement PostgreSQL get by id logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_get_all_postgressql() -> anyhow::Result<Vec<Metric>> {
+    async fn fn_repo_get_all_postgresql() -> anyhow::Result<Vec<Metric>> {
         // TODO: Implement PostgreSQL get all logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgressql(obj: Metric) -> anyhow::Result<Metric> {
+    async fn fn_repo_create_postgresql(obj: Metric) -> anyhow::Result<Metric> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_update_postgressql(obj: Metric) -> anyhow::Result<Metric> {
+    async fn fn_repo_update_postgresql(obj: Metric) -> anyhow::Result<Metric> {
         // TODO: Implement PostgreSQL update logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_delete_postgressql(id: i32) -> anyhow::Result<bool> {
+    async fn fn_repo_delete_postgresql(id: i32) -> anyhow::Result<bool> {
+        // TODO: Implement PostgreSQL delete logic
+        Err(anyhow::anyhow!("Not implemented"))
+    }
+
+    async fn fn_repo_get_by_setting_version_postgresql(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<Metric>> {
         // TODO: Implement PostgreSQL delete logic
         Err(anyhow::anyhow!("Not implemented"))
     }

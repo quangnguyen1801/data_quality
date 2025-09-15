@@ -1,13 +1,18 @@
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, fs, path::Path};
 
 use anyhow::{Context, Ok};
 use async_std::{fs::File, io::BufReader};
 use calamine::{RangeDeserializerBuilder, Reader, open_workbook_auto};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use csv_async::AsyncReaderBuilder;
-use futures::StreamExt;
-use model::modelviews::selector_view::SelectorView;
+use futures::{StreamExt, future::ok};
+use model::{modelviews::selector_view::SelectorView, shared::ultihelper::CONFIGS};
 use serde::de::DeserializeOwned;
+
+use crate::{
+    iservices::isettingversion_service::ISettingVersionService,
+    services::settingversion_service::SettingVersionService,
+};
 
 pub struct Helper {}
 impl Helper {
@@ -203,5 +208,17 @@ impl Helper {
 
     pub fn fn_ser_help_parse_datetime(s: &str, format: &str) -> Option<NaiveDateTime> {
         NaiveDateTime::parse_from_str(s, format).ok()
+    }
+
+    pub async fn fn_ser_help_is_setting_from_excel(path: String) -> anyhow::Result<(bool, i32)> {
+        let lastest_version = SettingVersionService::fn_ser_get_current_version().await?;
+        let file_info = fs::metadata(Path::new(&path)).unwrap();
+        let modified = file_info.modified()?;
+        let file_time: DateTime<Utc> = modified.into();
+        if file_time > lastest_version.upddate {
+            Ok((true, 0))
+        } else {
+            Ok((false, lastest_version.id))
+        }
     }
 }

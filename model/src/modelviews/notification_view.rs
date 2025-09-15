@@ -6,4 +6,5 @@ pub struct NotificationView {
     pub to: String,
     pub cc: String,
     pub bcc: String,
+    pub setting_version_id: i32,
 }

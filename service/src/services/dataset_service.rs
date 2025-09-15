@@ -14,7 +14,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let data = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_get_by_id_sqlserver(id).await?,
-            "PostgreSql" => DatasetRepository::fn_repo_get_by_id_postgressql(id).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_by_id_postgresql(id).await?,
             _ => DatasetRepository::fn_repo_get_by_id_sqlserver(id).await?,
         };
         let json = serde_json::to_string(&data)?;
@@ -26,7 +26,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let data = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_get_all_sqlserver().await?,
-            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgressql().await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgresql().await?,
             _ => DatasetRepository::fn_repo_get_all_sqlserver().await?,
         };
         let json = serde_json::to_string(&data)?;
@@ -49,7 +49,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let mut data = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_get_all_sqlserver().await?,
-            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgressql().await?,
+            "PostgreSql" => DatasetRepository::fn_repo_get_all_postgresql().await?,
             _ => DatasetRepository::fn_repo_get_all_sqlserver().await?,
         };
         if data.len() > start {
@@ -71,7 +71,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_create_sqlserver(data).await?,
-            "PostgreSql" => DatasetRepository::fn_repo_create_postgressql(data).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_create_postgresql(data).await?,
             _ => DatasetRepository::fn_repo_create_sqlserver(data).await?,
         };
         let js_result = serde_json::to_string(&result)?;
@@ -84,7 +84,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_update_sqlserver(data).await?,
-            "PostgreSql" => DatasetRepository::fn_repo_update_postgressql(data).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_update_postgresql(data).await?,
             _ => DatasetRepository::fn_repo_update_sqlserver(data).await?,
         };
         let js_result = serde_json::to_string(&result)?;
@@ -95,7 +95,7 @@ impl IDatasetService for DatasetService {
         let dbtype = (&CONFIGS.app_setting.dbtype).clone();
         let result = match dbtype.as_str() {
             "SQLServer" => DatasetRepository::fn_repo_delete_sqlserver(id).await?,
-            "PostgreSql" => DatasetRepository::fn_repo_delete_postgressql(id).await?,
+            "PostgreSql" => DatasetRepository::fn_repo_delete_postgresql(id).await?,
             _ => DatasetRepository::fn_repo_delete_sqlserver(id).await?,
         };
         Ok(result)
@@ -107,5 +107,25 @@ impl IDatasetService for DatasetService {
             ischeck = true;
         }
         Ok(ischeck)
+    }
+
+    async fn fn_ser_get_by_setting_version_id(
+        setting_version_id: i32,
+    ) -> anyhow::Result<DatasetView> {
+        let dbtype = CONFIGS.app_setting.dbtype.clone();
+        let data = match dbtype.as_str() {
+            "SQLServer" => {
+                DatasetRepository::fn_repo_get_by_setting_version_sqlserver(setting_version_id)
+                    .await?
+            }
+            "PostgreSql" => {
+                DatasetRepository::fn_repo_get_by_setting_version_postgresql(setting_version_id)
+                    .await?
+            }
+            _ => DatasetRepository::fn_repo_get_by_id_sqlserver(setting_version_id).await?,
+        };
+        let json = serde_json::to_string(&data)?;
+        let result = serde_json::from_str(&json)?;
+        Ok(result)
     }
 }

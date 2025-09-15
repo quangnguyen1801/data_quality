@@ -7,4 +7,5 @@ pub struct TestParameter {
     pub test_id: i32,
     pub name: String,
     pub description: String,
+    pub setting_version_id: i32,
 }

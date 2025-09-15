@@ -6,4 +6,5 @@ pub struct Metric {
     pub id: i32,
     pub dataset_id: i32,
     pub name: String,
+    pub setting_version_id: i32,
 }

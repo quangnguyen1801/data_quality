@@ -7,4 +7,5 @@ pub struct Scope {
     pub dataset_id: i32,
     pub selector_id: i32,
     pub metric_id: String,
+    pub setting_version_id: i32,
 }

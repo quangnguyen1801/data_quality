@@ -6,4 +6,5 @@ pub struct ScopeView {
     pub dataset_id: i32,
     pub selector_id: i32,
     pub metric_id: Vec<i32>,
+    pub setting_version_id: i32,
 }

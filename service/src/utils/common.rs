@@ -13,12 +13,18 @@ use model::{
 
 use crate::{
     iservices::{
-        idataset_service::IDatasetService, imetric_service::IMetricService,
-        iselector_service::ISelectorService,
+        iconfigtestparameter_service::IConfigTestParameterService,
+        idataset_service::IDatasetService, imatrixexecute_service::IMatrixExecuteService,
+        imetric_service::IMetricService, inotification_service::INotificationService,
+        iscope_service::IScopeService, iselector_service::ISelectorService,
+        itest_service::ITestService, itestparameter_service::ITestParameterService,
     },
     services::{
-        dataset_service::DatasetService, metric_service::MetricService,
-        selector_service::SelectorService,
+        configtestparameter_service::ConfigTestParameterService, dataset_service::DatasetService,
+        matrixexecute_service::MatrixExecuteService, metric_service::MetricService,
+        notification_service::NotificationService, scope_service::ScopeService,
+        selector_service::SelectorService, test_service::TestService,
+        testparameter_service::TestParameterService,
     },
     utils::helpers::Helper,
 };
@@ -38,52 +44,95 @@ impl Common {
         Vec<MatrixExecuteView>,
         Vec<NotificationView>,
     )> {
+        let (is_file, setting_ver_id) =
+            Helper::fn_ser_help_is_setting_from_excel(path.clone()).await?;
         //Dataset
-        let dataset =
+        let dataset = if is_file {
             Helper::fn_ser_help_read_excel_file::<DatasetView>(path.clone(), "Dataset".to_string())
                 .await?;
+        } else {
+            DatasetService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //Selector
-        let selector = Helper::fn_ser_help_read_excel_file::<SelectorView>(
-            path.clone(),
-            "Selector".to_string(),
-        )
-        .await?;
+        let selector = if is_file {
+            Helper::fn_ser_help_read_excel_file::<SelectorView>(
+                path.clone(),
+                "Selector".to_string(),
+            )
+            .await?;
+        } else {
+            SelectorService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //Metric
-        let metric =
+        let metric = if is_file {
             Helper::fn_ser_help_read_excel_file::<MetricView>(path.clone(), "Metric".to_string())
                 .await?;
+        } else {
+            MetricService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //Scope
-        let scope =
+        let scope = if is_file {
             Helper::fn_ser_help_read_excel_file::<ScopeView>(path.clone(), "Scope".to_string())
                 .await?;
+        } else {
+            ScopeService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //test
-        let test =
+        let test = if is_file {
             Helper::fn_ser_help_read_excel_file::<TestView>(path.clone(), "Test".to_string())
                 .await?;
+        } else {
+            TestService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //TestParameter
-        let testparameter = Helper::fn_ser_help_read_excel_file::<TestParameterView>(
-            path.clone(),
-            "TestParameter".to_string(),
-        )
-        .await?;
+        let testparameter = if is_file {
+            Helper::fn_ser_help_read_excel_file::<TestParameterView>(
+                path.clone(),
+                "TestParameter".to_string(),
+            )
+            .await?;
+        } else {
+            TestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //TestParameterSet
-        let testparameterset = Helper::fn_ser_help_read_excel_file::<ConfigTestParameterView>(
-            path.clone(),
-            "TestParameterSet".to_string(),
-        )
-        .await?;
+        let testparameterset = if is_file {
+            Helper::fn_ser_help_read_excel_file::<ConfigTestParameterView>(
+                path.clone(),
+                "TestParameterSet".to_string(),
+            )
+            .await?;
+        } else {
+            ConfigTestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //Matrix
-        let matrix = Helper::fn_ser_help_read_excel_file::<MatrixExecuteView>(
-            path.clone(),
-            "Matrix".to_string(),
-        )
-        .await?;
+        let matrix = if is_file {
+            Helper::fn_ser_help_read_excel_file::<MatrixExecuteView>(
+                path.clone(),
+                "Matrix".to_string(),
+            )
+            .await?;
+        } else {
+            MatrixExecuteService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         //Notification
-        let notification = Helper::fn_ser_help_read_excel_file::<NotificationView>(
-            path,
-            "Notification".to_string(),
-        )
-        .await?;
+        let notification = if is_file {
+            Helper::fn_ser_help_read_excel_file::<NotificationView>(
+                path,
+                "Notification".to_string(),
+            )
+            .await?;
+        } else {
+            NotificationService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+        };
+
         Ok((
             dataset,
             selector,

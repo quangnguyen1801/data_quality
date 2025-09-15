@@ -6,5 +6,6 @@ pub mod metric_service;
 pub mod notification_service;
 pub mod scope_service;
 pub mod selector_service;
+pub mod settingversion_service;
 pub mod test_service;
 pub mod testparameter_service;

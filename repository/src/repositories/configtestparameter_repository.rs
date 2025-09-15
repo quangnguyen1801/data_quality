@@ -112,31 +112,57 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
         }
     }
 
-    async fn fn_repo_get_by_id_postgressql(id: i32) -> anyhow::Result<ConfigTestParameter> {
+    async fn fn_repo_get_by_setting_version_sqlserver(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<ConfigTestParameter>> {
+        let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
+        let mut rows = client
+            .query(
+                "SELECT * FROM configtestparameter WHERE setting_version_id =@P1",
+                &[&setting_version_id],
+            )
+            .await?
+            .into_first_result()
+            .await?;
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(ConfigTestParameter::try_from_row(row)?);
+        }
+        Ok(result)
+    }
+
+    async fn fn_repo_get_by_id_postgresql(id: i32) -> anyhow::Result<ConfigTestParameter> {
         // TODO: Implement PostgreSQL get by id logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_get_all_postgressql() -> anyhow::Result<Vec<ConfigTestParameter>> {
+    async fn fn_repo_get_all_postgresql() -> anyhow::Result<Vec<ConfigTestParameter>> {
         // TODO: Implement PostgreSQL get all logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgressql(
+    async fn fn_repo_create_postgresql(
         obj: ConfigTestParameter,
     ) -> anyhow::Result<ConfigTestParameter> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_update_postgressql(
+    async fn fn_repo_update_postgresql(
         obj: ConfigTestParameter,
     ) -> anyhow::Result<ConfigTestParameter> {
         // TODO: Implement PostgreSQL update logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_delete_postgressql(id: i32) -> anyhow::Result<bool> {
+    async fn fn_repo_delete_postgresql(id: i32) -> anyhow::Result<bool> {
+        // TODO: Implement PostgreSQL delete logic
+        Err(anyhow::anyhow!("Not implemented"))
+    }
+
+    async fn fn_repo_get_by_setting_version_postgresql(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<ConfigTestParameter>> {
         // TODO: Implement PostgreSQL delete logic
         Err(anyhow::anyhow!("Not implemented"))
     }

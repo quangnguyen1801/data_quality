@@ -7,4 +7,5 @@ pub struct Notification {
     pub to: String,
     pub cc: String,
     pub bcc: String,
+    pub setting_version_id: i32,
 }

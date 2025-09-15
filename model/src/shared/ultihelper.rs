@@ -12,7 +12,7 @@ pub struct AppSetting {
     pub env: String,
     pub dbtype: String,
     pub sqlserver_connection: String,
-    pub postgressql_connection: String,
+    pub postgresql_connection: String,
     pub settings_path: String,
     pub root_datasets_path: String,
 }

@@ -91,27 +91,53 @@ impl IRepository<Scope> for ScopeRepository {
         }
     }
 
-    async fn fn_repo_get_by_id_postgressql(id: i32) -> anyhow::Result<Scope> {
+    async fn fn_repo_get_by_setting_version_sqlserver(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<Scope>> {
+        let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
+        let mut rows = client
+            .query(
+                "SELECT * FROM scope WHERE setting_version_id =@P1",
+                &[&setting_version_id],
+            )
+            .await?
+            .into_first_result()
+            .await?;
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(Scope::try_from_row(row)?);
+        }
+        Ok(result)
+    }
+
+    async fn fn_repo_get_by_id_postgresql(id: i32) -> anyhow::Result<Scope> {
         // TODO: Implement PostgreSQL get by id logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_get_all_postgressql() -> anyhow::Result<Vec<Scope>> {
+    async fn fn_repo_get_all_postgresql() -> anyhow::Result<Vec<Scope>> {
         // TODO: Implement PostgreSQL get all logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_create_postgressql(obj: Scope) -> anyhow::Result<Scope> {
+    async fn fn_repo_create_postgresql(obj: Scope) -> anyhow::Result<Scope> {
         // TODO: Implement PostgreSQL create logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_update_postgressql(obj: Scope) -> anyhow::Result<Scope> {
+    async fn fn_repo_update_postgresql(obj: Scope) -> anyhow::Result<Scope> {
         // TODO: Implement PostgreSQL update logic
         Err(anyhow::anyhow!("Not implemented"))
     }
 
-    async fn fn_repo_delete_postgressql(id: i32) -> anyhow::Result<bool> {
+    async fn fn_repo_delete_postgresql(id: i32) -> anyhow::Result<bool> {
+        // TODO: Implement PostgreSQL delete logic
+        Err(anyhow::anyhow!("Not implemented"))
+    }
+
+    async fn fn_repo_get_by_setting_version_postgresql(
+        setting_version_id: i32,
+    ) -> anyhow::Result<Vec<Scope>> {
         // TODO: Implement PostgreSQL delete logic
         Err(anyhow::anyhow!("Not implemented"))
     }

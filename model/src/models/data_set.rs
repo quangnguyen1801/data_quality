@@ -7,4 +7,5 @@ pub struct Dataset {
     pub data_type: String,
     pub path: String,
     pub name: String,
+    pub setting_version_id: i32,
 }
