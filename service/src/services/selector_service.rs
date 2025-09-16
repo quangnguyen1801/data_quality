@@ -110,7 +110,7 @@ impl ISelectorService for SelectorService {
 
     async fn fn_ser_get_by_setting_version_id(
         setting_version_id: i32,
-    ) -> anyhow::Result<SelectorView> {
+    ) -> anyhow::Result<Vec<SelectorView>> {
         let dbtype = CONFIGS.app_setting.dbtype.clone();
         let data = match dbtype.as_str() {
             "SQLServer" => {
@@ -121,7 +121,10 @@ impl ISelectorService for SelectorService {
                 SelectorRepository::fn_repo_get_by_setting_version_postgresql(setting_version_id)
                     .await?
             }
-            _ => SelectorRepository::fn_repo_get_by_id_sqlserver(setting_version_id).await?,
+            _ => {
+                SelectorRepository::fn_repo_get_by_setting_version_sqlserver(setting_version_id)
+                    .await?
+            }
         };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;

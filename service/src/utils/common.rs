@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 
 use anyhow::Ok;
+use chrono::{DateTime, Utc};
 use model::{
     modelviews::{
         configtestparameter_view::ConfigTestParameterView, dataset_view::DatasetView,
         matrixexecute_view::MatrixExecuteView, metric_view::MetricView,
         notification_view::NotificationView, scope_view::ScopeView, selector_view::SelectorView,
-        test_view::TestView, testparameter_view::TestParameterView,
+        settingversion_view::SettingVersionView, test_view::TestView,
+        testparameter_view::TestParameterView,
     },
     shared::ultihelper::{CONFIGS, ParameterSet, TestExecution},
 };
@@ -17,14 +19,15 @@ use crate::{
         idataset_service::IDatasetService, imatrixexecute_service::IMatrixExecuteService,
         imetric_service::IMetricService, inotification_service::INotificationService,
         iscope_service::IScopeService, iselector_service::ISelectorService,
-        itest_service::ITestService, itestparameter_service::ITestParameterService,
+        isettingversion_service::ISettingVersionService, itest_service::ITestService,
+        itestparameter_service::ITestParameterService,
     },
     services::{
         configtestparameter_service::ConfigTestParameterService, dataset_service::DatasetService,
         matrixexecute_service::MatrixExecuteService, metric_service::MetricService,
         notification_service::NotificationService, scope_service::ScopeService,
-        selector_service::SelectorService, test_service::TestService,
-        testparameter_service::TestParameterService,
+        selector_service::SelectorService, settingversion_service::SettingVersionService,
+        test_service::TestService, testparameter_service::TestParameterService,
     },
     utils::helpers::Helper,
 };
@@ -47,92 +50,116 @@ impl Common {
         let (is_file, setting_ver_id) =
             Helper::fn_ser_help_is_setting_from_excel(path.clone()).await?;
         //Dataset
-        let dataset = if is_file {
+        let mut dataset = if is_file {
             Helper::fn_ser_help_read_excel_file::<DatasetView>(path.clone(), "Dataset".to_string())
-                .await?;
+                .await?
         } else {
-            DatasetService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            DatasetService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //Selector
-        let selector = if is_file {
+        let mut selector = if is_file {
             Helper::fn_ser_help_read_excel_file::<SelectorView>(
                 path.clone(),
                 "Selector".to_string(),
             )
-            .await?;
+            .await?
         } else {
-            SelectorService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            SelectorService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //Metric
-        let metric = if is_file {
+        let mut metric = if is_file {
             Helper::fn_ser_help_read_excel_file::<MetricView>(path.clone(), "Metric".to_string())
-                .await?;
+                .await?
         } else {
-            MetricService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            MetricService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //Scope
-        let scope = if is_file {
+        let mut scope = if is_file {
             Helper::fn_ser_help_read_excel_file::<ScopeView>(path.clone(), "Scope".to_string())
-                .await?;
+                .await?
         } else {
-            ScopeService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            ScopeService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //test
-        let test = if is_file {
+        let mut test = if is_file {
             Helper::fn_ser_help_read_excel_file::<TestView>(path.clone(), "Test".to_string())
-                .await?;
+                .await?
         } else {
-            TestService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            TestService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //TestParameter
-        let testparameter = if is_file {
+        let mut testparameter = if is_file {
             Helper::fn_ser_help_read_excel_file::<TestParameterView>(
                 path.clone(),
                 "TestParameter".to_string(),
             )
-            .await?;
+            .await?
         } else {
-            TestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            TestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //TestParameterSet
-        let testparameterset = if is_file {
+        let mut testparameterset = if is_file {
             Helper::fn_ser_help_read_excel_file::<ConfigTestParameterView>(
                 path.clone(),
                 "TestParameterSet".to_string(),
             )
-            .await?;
+            .await?
         } else {
-            ConfigTestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            ConfigTestParameterService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //Matrix
-        let matrix = if is_file {
+        let mut matrix = if is_file {
             Helper::fn_ser_help_read_excel_file::<MatrixExecuteView>(
                 path.clone(),
                 "Matrix".to_string(),
             )
-            .await?;
+            .await?
         } else {
-            MatrixExecuteService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            MatrixExecuteService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
         //Notification
-        let notification = if is_file {
+        let mut notification = if is_file {
             Helper::fn_ser_help_read_excel_file::<NotificationView>(
                 path,
                 "Notification".to_string(),
             )
-            .await?;
+            .await?
         } else {
-            NotificationService::fn_ser_get_by_setting_version_id(setting_ver_id).await?;
+            NotificationService::fn_ser_get_by_setting_version_id(setting_ver_id).await?
         };
 
+        if is_file {
+            (
+                dataset,
+                selector,
+                metric,
+                scope,
+                test,
+                testparameter,
+                testparameterset,
+                matrix,
+                notification,
+            ) = Self::fn_ser_com_save_setting_to_db(
+                dataset,
+                selector,
+                metric,
+                scope,
+                test,
+                testparameter,
+                testparameterset,
+                matrix,
+                notification,
+            )
+            .await?;
+        }
         Ok((
             dataset,
             selector,
@@ -334,5 +361,92 @@ impl Common {
             }
         }
         Ok(list_actual_test_execution)
+    }
+
+    pub async fn fn_ser_com_save_setting_to_db(
+        datasets: Vec<DatasetView>,
+        selectors: Vec<SelectorView>,
+        metrics: Vec<MetricView>,
+        scopes: Vec<ScopeView>,
+        testcases: Vec<TestView>,
+        testparameters: Vec<TestParameterView>,
+        configparameters: Vec<ConfigTestParameterView>,
+        matrixexecutes: Vec<MatrixExecuteView>,
+        notifies: Vec<NotificationView>,
+    ) -> anyhow::Result<(
+        Vec<DatasetView>,
+        Vec<SelectorView>,
+        Vec<MetricView>,
+        Vec<ScopeView>,
+        Vec<TestView>,
+        Vec<TestParameterView>,
+        Vec<ConfigTestParameterView>,
+        Vec<MatrixExecuteView>,
+        Vec<NotificationView>,
+    )> {
+        //setting_version
+        let setting_ver = SettingVersionView {
+            id: 0,
+            file_name: "Setting.exel".to_string(),
+            upddate: Utc::now(),
+        };
+        SettingVersionService::fn_ser_create(setting_ver).await?;
+
+        //dataset
+        let mut res_datasets = Vec::new();
+        for dtset in datasets.iter().cloned() {
+            res_datasets.push(DatasetService::fn_ser_create(dtset).await.unwrap());
+        }
+        //selector
+        let mut res_selectors = Vec::new();
+        for sl in selectors.iter().cloned() {
+            res_selectors.push(SelectorService::fn_ser_create(sl).await.unwrap());
+        }
+        //metric
+        let mut res_metrics = Vec::new();
+        for m in metrics.iter().cloned() {
+            res_metrics.push(MetricService::fn_ser_create(m).await.unwrap());
+        }
+        //scope
+        let mut res_scopes = Vec::new();
+        for sc in scopes.iter().cloned() {
+            res_scopes.push(ScopeService::fn_ser_create(sc).await.unwrap());
+        }
+        //testcase
+        let mut res_testcases = Vec::new();
+        for t in testcases.iter().cloned() {
+            res_testcases.push(TestService::fn_ser_create(t).await.unwrap());
+        }
+        //testparameter
+        let mut res_testparameters = Vec::new();
+        for tp in testparameters.iter().cloned() {
+            res_testparameters.push(TestParameterService::fn_ser_create(tp).await.unwrap());
+        }
+        //configparameter
+        let mut res_configparameters = Vec::new();
+        for ct in configparameters.iter().cloned() {
+            res_configparameters.push(ConfigTestParameterService::fn_ser_create(ct).await.unwrap());
+        }
+        //matrixexecute
+        let mut res_matrixexecutes = Vec::new();
+        for mt in matrixexecutes.iter().cloned() {
+            res_matrixexecutes.push(MatrixExecuteService::fn_ser_create(mt).await.unwrap());
+        }
+        //notify
+        let mut res_notifies = Vec::new();
+        for n in notifies.iter().cloned() {
+            res_notifies.push(NotificationService::fn_ser_create(n).await.unwrap());
+        }
+        Ok((
+            res_datasets,
+            res_selectors,
+            res_metrics,
+            res_scopes,
+            res_testcases,
+            res_testparameters,
+            res_configparameters,
+            res_matrixexecutes,
+            res_notifies,
+        ))
     }
 }

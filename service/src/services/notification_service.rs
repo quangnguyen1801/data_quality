@@ -102,7 +102,7 @@ impl INotificationService for NotificationService {
 
     async fn fn_ser_get_by_setting_version_id(
         setting_version_id: i32,
-    ) -> anyhow::Result<NotificationView> {
+    ) -> anyhow::Result<Vec<NotificationView>> {
         let dbtype = CONFIGS.app_setting.dbtype.clone();
         let data = match dbtype.as_str() {
             "SQLServer" => {
@@ -115,7 +115,10 @@ impl INotificationService for NotificationService {
                 )
                 .await?
             }
-            _ => NotificationRepository::fn_repo_get_by_id_sqlserver(setting_version_id).await?,
+            _ => {
+                NotificationRepository::fn_repo_get_by_setting_version_sqlserver(setting_version_id)
+                    .await?
+            }
         };
         let json = serde_json::to_string(&data)?;
         let result = serde_json::from_str(&json)?;
