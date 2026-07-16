@@ -39,15 +39,18 @@ impl IRepository<TestParameter> for TestParameterRepository {
             "INSERT INTO [dbo].[testparameter]
            ([test_id]
            ,[name]
-           ,[description])
+           ,[description]
+           ,[setting_version_id])
             VALUES
                 (@P1
                 ,@P2
-                ,@P3)",
+                ,@P3
+                ,@P4)",
         );
         query.bind(obj.test_id);
         query.bind(obj.name);
         query.bind(obj.description);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -66,11 +69,13 @@ impl IRepository<TestParameter> for TestParameterRepository {
             SET [test_id] = @P1
                 ,[name] = @P2
                 ,[description] = @P3
-            WHERE id=@P4",
+                ,[setting_version_id] = @P4
+            WHERE id=@P5",
         );
         query.bind(obj.test_id);
         query.bind(obj.name);
         query.bind(obj.description);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -96,7 +101,7 @@ impl IRepository<TestParameter> for TestParameterRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<TestParameter>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM testparameter WHERE setting_version_id =@P1",
                 &[&setting_version_id],

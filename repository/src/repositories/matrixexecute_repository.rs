@@ -39,16 +39,19 @@ impl IRepository<MatrixExecute> for MatrixExecuteRepository {
             "INSERT INTO [dbo].[matrixexecute]
            ([test_id]
            ,[config_test_parameter_id]
-           ,[scope_id])
+           ,[scope_id]
+           ,[setting_version_id])
             VALUES
                 (@P1
                 ,@P2
-                ,@P3)
+                ,@P3
+                ,@P4)
         ",
         );
         query.bind(obj.test_id);
         query.bind(obj.config_test_paramter_id);
         query.bind(obj.scope_id);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -67,11 +70,13 @@ impl IRepository<MatrixExecute> for MatrixExecuteRepository {
             SET [test_id] = @P1
                 ,[config_test_parameter_id] = @P2
                 ,[scope_id] = @P3
-            WHERE id=@P4",
+                ,[setting_version_id] = @P4
+            WHERE id=@P5",
         );
         query.bind(obj.test_id);
         query.bind(obj.config_test_paramter_id);
         query.bind(obj.scope_id);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {

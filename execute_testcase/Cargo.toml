@@ -8,6 +8,7 @@ anyhow = "1.0.99"
 async-std = "1.13.2"
 async-trait = "0.1.89"
 model={path="../model"}
+polars = {version = "0.51.0", features=["lazy", "strings"]}
 service={path="../service"}
 strum = "0.27.2"
 strum_macros = "0.27.2"

@@ -39,13 +39,16 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
         let mut query = Query::new(
             "INSERT INTO [dbo].[comparisonop]
            ([inc_excl]
-           ,[operator])
+           ,[operator]
+           ,[setting_version_id])
             VALUES
                 (@P1
-                ,@P2)",
+                ,@P2
+                ,@P3)",
         );
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -63,10 +66,12 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
             "UPDATE [dbo].[comparisonop]
             SET [inc_excl] = @P1
                 ,[operator] = @P2
-            WHERE id=@P3",
+                ,[setting_version_id] = @P3
+            WHERE id=@P4",
         );
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -92,7 +97,7 @@ impl IRepository<ComparisonOp> for ComparisonOpRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<ComparisonOp>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM comparisonop WHERE setting_version_id =@P1",
                 &[&setting_version_id],

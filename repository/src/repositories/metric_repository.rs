@@ -38,13 +38,16 @@ impl IRepository<Metric> for MetricRepository {
         let mut query = Query::new(
             "INSERT INTO [dbo].[metric]
            ([dataset_id]
-           ,[name])
+           ,[name]
+           ,[setting_version_id])
             VALUES
                 (@P1
-                ,@P2)",
+                ,@P2
+                ,@P3)",
         );
         query.bind(obj.dataset_id);
         query.bind(obj.name);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -62,10 +65,12 @@ impl IRepository<Metric> for MetricRepository {
             "UPDATE [dbo].[metric]
             SET [dataset_id] = @P1
                 ,[name] = @P2
-            WHERE id=@P3",
+                ,[setting_version_id] = @P3
+            WHERE id=@P4",
         );
         query.bind(obj.dataset_id);
         query.bind(obj.name);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -91,7 +96,7 @@ impl IRepository<Metric> for MetricRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<Metric>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM metric WHERE setting_version_id =@P1",
                 &[&setting_version_id],

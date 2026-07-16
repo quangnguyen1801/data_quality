@@ -41,19 +41,22 @@ impl IRepository<Selector> for SelectorRepository {
            ,[inc_excl]
            ,[operator]
            ,[vlow]
-           ,[vhigh])
+           ,[vhigh]
+           ,[setting_version_id])
             VALUES
                 (@P1
                 ,@P2
                 ,@P3
                 ,@P4
-                ,@P5)",
+                ,@P5
+                ,@P6)",
         );
         query.bind(obj.field_name);
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
         query.bind(obj.vlow);
         query.bind(obj.vhigh);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -74,13 +77,16 @@ impl IRepository<Selector> for SelectorRepository {
                 ,[operator] = @P3
                 ,[vlow] = @P4
                 ,[vhigh] = @P5
-            WHERE id = @P6",
+                ,[setting_version_id] = @P6
+            WHERE id = @P7",
         );
         query.bind(obj.field_name);
         query.bind(obj.inc_excl);
         query.bind(obj.operator);
         query.bind(obj.vlow);
         query.bind(obj.vhigh);
+        query.bind(obj.setting_version_id);
+        query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
             Ok(objclone)
@@ -105,7 +111,7 @@ impl IRepository<Selector> for SelectorRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<Selector>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM selector WHERE setting_version_id =@P1",
                 &[&setting_version_id],

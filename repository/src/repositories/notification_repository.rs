@@ -39,15 +39,18 @@ impl IRepository<Notification> for NotificationRepository {
             "INSERT INTO [dbo].[notification]
            ([to]
            ,[cc]
-           ,[bcc])
+           ,[bcc]
+           ,[setting_version_id])
             VALUES
                 (@P1
                 ,@P2
-                ,@P3)",
+                ,@P3
+                ,@P4)",
         );
         query.bind(obj.to);
         query.bind(obj.cc);
         query.bind(obj.bcc);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -66,11 +69,13 @@ impl IRepository<Notification> for NotificationRepository {
             SET [to] = @P1
                 ,[cc] = @P2
                 ,[bcc] = @P3
-            WHERE id=@P4",
+                ,[setting_version_id] = @P4
+            WHERE id=@P5",
         );
         query.bind(obj.to);
         query.bind(obj.cc);
         query.bind(obj.bcc);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {

@@ -297,6 +297,7 @@ impl Common {
                 param_value: vec![cg_param.vlow, cg_param.vhigh],
                 operator: cg_param.operator,
                 incl_excl: cg_param.inc_excl,
+                ref_columns: cg_param.ref_columns,
             });
         }
         Ok(list_params)

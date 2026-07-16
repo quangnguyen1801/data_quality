@@ -10,4 +10,5 @@ pub struct ConfigTestParameterView {
     pub vlow: String,
     pub vhigh: String,
     pub setting_version_id: i32,
+    pub ref_columns: i32,
 }

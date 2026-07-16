@@ -39,15 +39,18 @@ impl IRepository<Test> for TestRepository {
             "INSERT INTO [dbo].[test]
            ([group]
            ,[description]
-           ,[expired])
+           ,[expired]
+           ,[setting_version_id])
             VALUES
                 (@P1
                 ,@P2
-                ,@P3)",
+                ,@P3
+                ,@P4)",
         );
         query.bind(obj.group);
         query.bind(obj.description);
         query.bind(obj.expired);
+        query.bind(obj.setting_version_id);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -66,11 +69,13 @@ impl IRepository<Test> for TestRepository {
             SET [group] = @P1
                 ,[description] = @P2
                 ,[expired] = @P3
-            WHERE id=@P4",
+                ,[setting_version_id] = @P4
+            WHERE id=@P5",
         );
         query.bind(obj.group);
         query.bind(obj.description);
         query.bind(obj.expired);
+        query.bind(obj.setting_version_id);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -96,7 +101,7 @@ impl IRepository<Test> for TestRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<Test>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM test WHERE setting_version_id =@P1",
                 &[&setting_version_id],

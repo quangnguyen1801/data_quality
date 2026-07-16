@@ -45,14 +45,18 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
            ,[inc_excl]
            ,[operator]
            ,[vlow]
-           ,[vhigh])
+           ,[vhigh]
+           ,[setting_version_id]
+           ,[ref_columns])
             VALUES
                 (@P1
                 ,@P2
                 ,@P3
                 ,@P4
                 ,@P5
-                ,@P6)",
+                ,@P6
+                ,@P7
+                ,@P8)",
         );
         query.bind(obj.test_id);
         query.bind(obj.test_parameter_id);
@@ -60,6 +64,8 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
         query.bind(obj.operator);
         query.bind(obj.vlow);
         query.bind(obj.vhigh);
+        query.bind(obj.setting_version_id);
+        query.bind(obj.ref_columns);
         let res = query.execute(&mut client).await?;
         if res.rows_affected().len() > 0 {
             let rows = Self::fn_repo_get_all_sqlserver().await?;
@@ -83,7 +89,9 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
                 ,[operator] = @P4
                 ,[vlow] = @P5
                 ,[vhigh] = @P6
-            WHERE  id=@P7",
+                ,[setting_version_id] = @P7
+                ,[ref_columns] = @P8
+            WHERE  id=@P9",
         );
         query.bind(obj.test_id);
         query.bind(obj.test_parameter_id);
@@ -91,6 +99,8 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
         query.bind(obj.operator);
         query.bind(obj.vlow);
         query.bind(obj.vhigh);
+        query.bind(obj.setting_version_id);
+        query.bind(obj.ref_columns);
         query.bind(obj.id);
         let result = query.execute(&mut client).await?;
         if result.rows_affected().len() > 0 {
@@ -116,7 +126,7 @@ impl IRepository<ConfigTestParameter> for ConfigTestParameterRepository {
         setting_version_id: i32,
     ) -> anyhow::Result<Vec<ConfigTestParameter>> {
         let mut client = Connection::fn_repo_get_connection_sqlsever().await?;
-        let mut rows = client
+        let rows = client
             .query(
                 "SELECT * FROM configtestparameter WHERE setting_version_id =@P1",
                 &[&setting_version_id],

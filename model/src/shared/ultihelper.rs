@@ -36,6 +36,7 @@ pub struct ParameterSet {
     pub param_value: Vec<String>,
     pub operator: String,
     pub incl_excl: String,
+    pub ref_columns: i32,
 }
 
 use once_cell::sync::Lazy;
