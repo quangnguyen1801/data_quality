@@ -30,8 +30,8 @@ impl TestLogic for TestCaseForexDailyIsInCheck {
                     let mut cols = test_case.test_columns.clone();
                     let params: Vec<ParameterSet> = parameters
                         .iter()
-                        .clone()
                         .filter(|p| p.ref_columns == 1)
+                        .cloned()
                         .collect();
                     // cols.extend(
                     //     parameters
